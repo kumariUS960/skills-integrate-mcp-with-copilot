@@ -3,6 +3,56 @@ document.addEventListener("DOMContentLoaded", () => {
   const activitySelect = document.getElementById("activity");
   const signupForm = document.getElementById("signup-form");
   const messageDiv = document.getElementById("message");
+  const accountButton = document.getElementById("account-button");
+  const accountMenu = document.getElementById("account-menu");
+  const loginButton = document.getElementById("login-button");
+  const logoutButton = document.getElementById("logout-button");
+  const signupContainer = document.getElementById("signup-container");
+  let teacherCredentials = sessionStorage.getItem("teacherCredentials");
+
+  function setAuthenticated(authenticated) {
+    signupContainer.classList.toggle("hidden", !authenticated);
+    loginButton.classList.toggle("hidden", authenticated);
+    logoutButton.classList.toggle("hidden", !authenticated);
+  }
+
+  function authHeaders() {
+    return teacherCredentials
+      ? { Authorization: `Basic ${teacherCredentials}` }
+      : {};
+  }
+
+  async function login() {
+    const username = window.prompt("Teacher username:");
+    if (!username) return;
+    const password = window.prompt("Teacher password:");
+    if (!password) return;
+
+    const encodedCredentials = btoa(`${username}:${password}`);
+    const response = await fetch("/auth/verify", {
+      headers: { Authorization: `Basic ${encodedCredentials}` },
+    });
+    if (!response.ok) {
+      messageDiv.textContent = "Invalid teacher username or password.";
+      messageDiv.className = "error";
+      messageDiv.classList.remove("hidden");
+      return;
+    }
+    teacherCredentials = encodedCredentials;
+    sessionStorage.setItem("teacherCredentials", teacherCredentials);
+    setAuthenticated(true);
+  }
+
+  accountButton.addEventListener("click", () => {
+    accountMenu.classList.toggle("hidden");
+  });
+  loginButton.addEventListener("click", login);
+  logoutButton.addEventListener("click", () => {
+    teacherCredentials = null;
+    sessionStorage.removeItem("teacherCredentials");
+    setAuthenticated(false);
+  });
+  setAuthenticated(Boolean(teacherCredentials));
 
   // Function to fetch activities from API
   async function fetchActivities() {
@@ -80,6 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
         )}/unregister?email=${encodeURIComponent(email)}`,
         {
           method: "DELETE",
+          headers: authHeaders(),
         }
       );
 
@@ -124,6 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
         )}/signup?email=${encodeURIComponent(email)}`,
         {
           method: "POST",
+          headers: authHeaders(),
         }
       );
 
