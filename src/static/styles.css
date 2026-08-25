@@ -16,12 +16,42 @@ body {
 }
 
 header {
+  position: relative;
   text-align: center;
   padding: 20px 0;
   margin-bottom: 30px;
   background-color: #1a237e;
   color: white;
   border-radius: 5px;
+}
+
+.account-area {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+#account-button {
+  padding: 6px 9px;
+  background: transparent;
+  font-size: 20px;
+}
+
+.account-menu {
+  position: absolute;
+  right: 0;
+  z-index: 1;
+  min-width: 140px;
+  padding: 8px;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.account-menu button {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
 }
 
 header h1 {
